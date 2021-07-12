@@ -10,7 +10,7 @@ df = pd.DataFrame(data, columns=['gender','race/ethnicity','parental level of ed
 
 total = df['years to graduate'].sum(axis = 0)
 sample_size = df['years to graduate'].count()
-sample_mean = total/(sample_size - 1)
+sample_mean = total/sample_size 
 population_mean = total/sample_size
 t_dis = abs(stats.t.ppf(0.025,sample_size - 1))
 
@@ -26,9 +26,9 @@ def a():
 
     print("Result:")
 
-    print((sample_mean - t_dis) * (sample_stdv / np.sqrt(sample_size)))
+    print(sample_mean - t_dis * (sample_stdv / np.sqrt(sample_size)))
 
-    print((sample_mean + t_dis) * (sample_stdv / np.sqrt(sample_size)))
+    print(sample_mean + t_dis * (sample_stdv / np.sqrt(sample_size)))
 
 df['Deviation'] = (df['years to graduate'] - sample_mean)*(df['years to graduate'] - sample_mean)
 variance  = (df['Deviation'].sum(axis = 0) / (sample_size - 1))
@@ -37,6 +37,9 @@ sample_stdv = np.sqrt(variance)
 def b():
     print("Variance:")
     print(variance)
-    print(str((sample_size - 1) * variance / stats.chi2.ppf(q=1 - 0.05, df=999)) + " <= u <= " + str(
-        (sample_size - 1) * variance / stats.chi2.ppf(q=0.05, df=999)))
+    print(str((sample_size - 1) * variance / stats.chi2.ppf(q=1 - 0.05/2, df=999)) + " <= u <= " + str(
+        (sample_size - 1) * variance / stats.chi2.ppf(q=0.05/2, df=999)))
+
+a()
+b()
 
