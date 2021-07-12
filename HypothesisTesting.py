@@ -7,7 +7,7 @@ import numpy as np
 df = pd.read_csv("US_2017_GRADUATION_RATE.csv")
 total = df['years to graduate'].sum(axis = 0)
 sample_size = df['years to graduate'].count()
-sample_mean = total/(sample_size - 1)
+sample_mean = total/sample_size 
 sample_std = df['years to graduate'].std()
 population_mean = total/sample_size
 
@@ -54,7 +54,7 @@ def mean_cal(gender):
             amount = amount +1
 
     res.append(amount)
-    res.append(round(total/amount, 2))
+    res.append(total/amount)
     return res
 
 def cal_var(lst, gender):
@@ -63,21 +63,21 @@ def cal_var(lst, gender):
         if row[1]['gender']==gender:
             vari = vari + math.pow(row[1]["years to graduate"]-lst[1], 2)
 
-    return round(vari, 2)
+    return vari/(sample_size-1)
 
 mal =  mean_cal("male" )
 mal.append(cal_var(mal, "male"))
 fem = mean_cal("female")
 fem.append(cal_var(fem, "female"))
-dof = round((math.pow(mal[2]/mal[0]+fem[2]/fem[0], 2))/(math.pow(mal[2]/mal[0], 2)/(mal[0]-1)+math.pow(fem[2]/fem[0], 2)/(fem[0]-1)), 2)
+dof = math.floor((math.pow(mal[2]/mal[0]+fem[2]/fem[0], 2))/(math.pow(mal[2]/mal[0], 2)/(mal[0]-1)+math.pow(fem[2]/fem[0], 2)/(fem[0]-1)))
 
 print("Sample mean : Male ="+ str(mal[1])+" | "+"Female ="+str(fem[1]))
 print("Sample size : Male ="+ str(mal[0])+" | "+"Female ="+str(fem[0]))
-print("Varience : Male ="+ str(mal[2])+" | "+"Female ="+str(fem[2]))
+print("Variance : Male ="+ str(mal[2])+" | "+"Female ="+str(fem[2]))
 print("Degree of Freedom : "+ str(dof))
 # calculate t-dis
 t_dis= stats.t.ppf(1-alpha/2, df=dof)
-print("t-distribution :"+str(round(t_dis, 7)))
+print("t-distribution :"+str(t_dis))
 std = math.sqrt(mal[2]/mal[0]+fem[2]/fem[0])
 print(str(mal[1]-fem[1]-t_dis*std)+" <= µ1 −µ2 <= "+ str(mal[1]-fem[1]+t_dis*std))
 
@@ -92,27 +92,27 @@ def sample_pro(lst, gender):
                 amount = amount+1
     res = []
     res.append(amount)
-    res.append(round(amount/lst[0], 5))
-    return  res
+    res.append(amount/lst[0])
+    return res
 
 mal_pro = sample_pro(mal, 'male')
 fem_pro = sample_pro(fem, 'female')
-total_sample_pro = round((mal_pro[0]+fem_pro[0])/(mal_pro[1]+fem_pro[1]), 2)
-z=round(stats.norm.ppf(1-alpha/2), 5)
+total_sample_pro = (mal_pro[0]+fem_pro[0])/(mal_pro[1]+fem_pro[1])
+z=stats.norm.ppf(1-alpha/2)
 std_pro= math.sqrt((mal_pro[1]*(1-mal_pro[1]))/mal_pro[0]+(fem_pro[1]*(1-fem_pro[1]))/fem_pro[0])
 
 print("Sample propotion : "+ str(total_sample_pro))
 print("Male completed test SS :" + str(mal_pro[1]))
 print("Female completed test SS :" + str(fem_pro[1]))
 print("Standard Normal Distribution: "+ str(z))
-print(str(round(mal_pro[1]-fem_pro[1]-z*std_pro, 5))+" <= p1 − p2 <= " +str(round(mal_pro[1]-fem_pro[1]+z*std_pro, 5)))
+print(str(mal_pro[1]-fem_pro[1]-z*std_pro)+" <= p1 − p2 <= " +str(mal_pro[1]-fem_pro[1]+z*std_pro))
 
 print("============================================================")
 print("4.c")
 print("Hypothesis mean diff :")
 mean_diff = float(input())
 test_stat_2m  =  (mal[1]-fem[1]-mean_diff)/(math.sqrt(mal[2]/mal[0]+fem[2]/fem[0]))
-p_value_p = 2*(stats.norm.sf(abs(test_stat_2m)))
+p_value_p = 2*(stats.t.sf(abs(test_stat_2m), df=sample_size-1))
 print(test_stat_2m)
 print(p_value_p)
 
@@ -120,7 +120,7 @@ print("============================================================")
 print("4.d")
 pool_pro = (mal_pro[0]+fem_pro[0])/(mal[0]+fem[0])
 test_stat_2p = (mal_pro[1]-fem_pro[1])/(math.sqrt(pool_pro*(1-pool_pro)*(1/mal[0]+1/fem[0])))
-p_value_2p = (1-round( stats.norm.sf(abs(test_stat_2p)), 5))
+p_value_2p = (1-stats.norm.sf(abs(test_stat_2p)))
 print(pool_pro)
 print(test_stat_2p)
 print(p_value_2p)
